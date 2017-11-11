@@ -3,21 +3,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rocket : MonoBehaviour {
-	public float thrustSpeed = 5f;
+public class Rocket : MonoBehaviour
+{
+	[SerializeField] float thrustSpeed;
+	[SerializeField] float rotationSpeed;
+
 	Rigidbody rb;
 	AudioSource audioSource;
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+	{
 		rb = GetComponent<Rigidbody>();
 		audioSource = GetComponent<AudioSource>();
 	}
-	
+
 	// Update is called once per frame
-	void Update () {
+	void Update()
+	{
 		GetInput();
 	}
+
+	void OnCollisionEnter(Collision collision)
+	{
+		switch (collision.gameObject.tag)
+		{
+			case "Friendly":
+				Debug.Log("Friendly");
+				break;
+			case "Fuel":
+				Debug.Log("Fuel");
+				break;
+			case "Death":
+				Debug.Log("Dead");
+				break;
+			default:
+				Debug.LogWarning("DEATH");
+				break;
+		}
+	}
+
 
 	private void GetInput()
 	{
@@ -44,17 +69,18 @@ public class Rocket : MonoBehaviour {
 
 	private void Rotate()
 	{
+
 		rb.freezeRotation = true; // take manual control of rotation
 		if (Input.GetKey(KeyCode.A))
 		{
 			//rotate left
-			transform.Rotate(Vector3.forward);
+			transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
 
 		}
 		else if (Input.GetKey(KeyCode.D))
 		{
 			//rotate right
-			transform.Rotate(-Vector3.forward);
+			transform.Rotate(-Vector3.forward * rotationSpeed * Time.deltaTime);
 
 		}
 
