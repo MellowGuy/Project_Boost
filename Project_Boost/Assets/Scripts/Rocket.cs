@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
@@ -10,18 +11,24 @@ public class Rocket : MonoBehaviour
 
 	Rigidbody rb;
 	AudioSource audioSource;
+	ShipMetricDisplay metrics;
 
 	// Use this for initialization
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
 		audioSource = GetComponent<AudioSource>();
+		metrics = GameObject.Find("Stats").GetComponent<ShipMetricDisplay>();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 		GetInput();
+		Vector3 shipVelocity = rb.velocity;
+		float shipAngle = transform.rotation.z;
+		metrics.SetStats(shipVelocity, shipAngle);
+
 	}
 
 	void OnCollisionEnter(Collision collision)
@@ -31,8 +38,9 @@ public class Rocket : MonoBehaviour
 			case "Friendly":
 				Debug.Log("Friendly");
 				break;
-			case "Fuel":
-				Debug.Log("Fuel");
+			case "Finish":
+				Debug.LogWarning("Finished!");
+				SceneManager.LoadScene(1);
 				break;
 			case "Death":
 				Debug.Log("Dead");

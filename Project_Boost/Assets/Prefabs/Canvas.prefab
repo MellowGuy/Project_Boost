@@ -115,7 +115,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Velocity: 250 m/s'
+  m_Text: 'Velocity: ??? m/s
+
+'
 --- !u!222 &222026431292265572
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -149,7 +151,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1360733705165308}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -444.25, y: 227, z: 0}
+  m_LocalPosition: {x: -348.97, y: 227, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224429497661036732}
@@ -157,8 +159,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -444.25, y: 227}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -348.97, y: 227}
+  m_SizeDelta: {x: 290.57, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224429497661036732
 RectTransform:
