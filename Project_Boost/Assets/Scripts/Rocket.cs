@@ -6,8 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
+	#region SerializeFields
+	[SerializeField] float levelLoadDelay = 3f;
 	[SerializeField] float thrustSpeed;
 	[SerializeField] float rotationSpeed;
+
 	[SerializeField] AudioClip mainEngine;
 	[SerializeField] AudioClip successSound;
 	[SerializeField] AudioClip deathSound;
@@ -15,10 +18,12 @@ public class Rocket : MonoBehaviour
 	[SerializeField] ParticleSystem mainEngineParticles;
 	[SerializeField] ParticleSystem successParticles;
 	[SerializeField] ParticleSystem deathParticles;
+	#endregion
 
 	Rigidbody rb;
 	AudioSource audioSource;
-	ShipMetricDisplay metrics;
+	ShipMetricDisplay shipMetrics;
+	Collider coll;
 
 	enum State { Alive, Dying, Transcending }
 	State state = State.Alive;
@@ -28,7 +33,8 @@ public class Rocket : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody>();
 		audioSource = GetComponent<AudioSource>();
-		metrics = GameObject.Find("Stats").GetComponent<ShipMetricDisplay>();
+		shipMetrics = GameObject.Find("Stats").GetComponent<ShipMetricDisplay>();
+		coll = GetComponent<Collider>();
 	}
 
 	// Update is called once per frame
@@ -39,10 +45,16 @@ public class Rocket : MonoBehaviour
 			RespondToThrustInput();
 			RespondToRotateInput();
 		}
+
 		//calculates velocity/angle and gives to metrics SetStats function.
 		Vector3 shipVelocity = rb.velocity;
 		float shipAngle = transform.rotation.z;
-		metrics.SetStats(shipVelocity, shipAngle);
+		shipMetrics.SetStats(shipVelocity, shipAngle);
+
+		if (Debug.isDebugBuild)
+		{
+			GetDebugInput();
+		}
 	}
 
 	void OnCollisionEnter(Collision collision)
@@ -73,7 +85,7 @@ public class Rocket : MonoBehaviour
 		state = State.Dying;
 		audioSource.PlayOneShot(deathSound);
 		deathParticles.Play();
-		Invoke("LoadFirstScene", 2f);
+		Invoke("LoadFirstScene", levelLoadDelay);
 	}
 
 	private void StartSuccessSequence()
@@ -83,12 +95,24 @@ public class Rocket : MonoBehaviour
 		state = State.Transcending;
 		audioSource.PlayOneShot(successSound);
 		successParticles.Play();
-		Invoke("LoadNextScene", 2f);
+		Invoke("LoadNextScene", levelLoadDelay);
 	}
 
 	private void LoadNextScene()
 	{
-		SceneManager.LoadScene(1); //TODO allow for more than 2 levels
+		//gets current and next scene index
+		int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+		int nextSceneIndex = currentSceneIndex + 1;
+
+		if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
+		{
+			LoadFirstScene();
+		}
+		else
+		{
+			SceneManager.LoadScene(currentSceneIndex + 1);
+		}
+		Debug.LogWarning("SceneIndex:" + nextSceneIndex);
 	}
 
 	private void LoadFirstScene()
@@ -125,21 +149,27 @@ public class Rocket : MonoBehaviour
 
 	private void RespondToRotateInput()
 	{
-		rb.freezeRotation = true; // take manual control of rotation
+		rb.angularVelocity = Vector3.zero; //remove rotation due to physics
 
 		if (Input.GetKey(KeyCode.A))
 		{
 			//rotate left
 			transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
-
 		}
 		else if (Input.GetKey(KeyCode.D))
 		{
 			//rotate right
 			transform.Rotate(-Vector3.forward * rotationSpeed * Time.deltaTime);
-
 		}
+	}
 
-		rb.freezeRotation = false; //resume physics control of rotation
+	//adds some debug keys 'L' to LoadNextScene, 'C' to toggle collider
+	private void GetDebugInput()
+	{
+		if (Input.GetKeyDown(KeyCode.L))
+			LoadNextScene();
+
+		if (Input.GetKeyDown(KeyCode.C))
+			coll.enabled = !coll.enabled;
 	}
 }
